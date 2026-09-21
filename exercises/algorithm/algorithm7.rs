@@ -2,8 +2,7 @@
 	stack
 	This question requires you to use a stack to achieve a bracket match
 */
-
-// I AM NOT DONE
+ use std::collections::HashMap;
 #[derive(Debug)]
 struct Stack<T> {
 	size: usize,
@@ -31,12 +30,18 @@ impl<T> Stack<T> {
 		self.size += 1;
 	}
 	fn pop(&mut self) -> Option<T> {
-		// TODO
-		None
+	    // TODO
+            match self.size {
+                ..=0 => { None },
+                _ => {
+                    self.size -= 1;
+                    Some(self.data.pop()?)
+                }
+            }
 	}
 	fn peek(&self) -> Option<&T> {
 		if 0 == self.size {
-			return None;
+		    return None;
 		}
 		self.data.get(self.size - 1)
 	}
@@ -101,8 +106,24 @@ impl<'a, T> Iterator for IterMut<'a, T> {
 
 fn bracket_match(bracket: &str) -> bool
 {
-	//TODO
-	true
+    //TODO
+    let mut st :Stack<char> = Stack::new();
+    let mp = HashMap::from([(')', '('),
+        (']', '['),
+        ('}', '{')]);
+    for ch in bracket.chars() {
+        match ch {
+            '(' | '{' | '[' => st.push(ch),
+            ']' | ')' | '}' => {
+                match (st.pop(), mp.get(&ch)) {
+                    (Some(l), Some(&r)) if l == r => {},
+                    _ => return false,
+                }
+            },
+            _ => {},
+        }
+    }
+    st.is_empty()
 }
 
 #[cfg(test)]
@@ -112,7 +133,7 @@ mod tests {
 	#[test]
 	fn bracket_matching_1(){
 		let s = "(2+3){func}[abc]";
-		assert_eq!(bracket_match(s),true);
+	    assert_eq!(bracket_match(s),true);
 	}
 	#[test]
 	fn bracket_matching_2(){
